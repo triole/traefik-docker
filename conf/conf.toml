@@ -1,0 +1,42 @@
+[file]
+watch = true
+
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+domain = "localhost"
+watch = true
+exposedByDefault = false
+
+[log]
+filePath = "/dev/stdout"
+format = "text"
+level = "INFO"
+
+[accessLog]
+filePath = "/dev/stdout"
+
+[api]
+dashboard = true
+insecure = true
+debug = true
+
+[providers]
+docker = true
+[providers.file]
+filename = "/vol/conf/providers.toml"
+
+[entryPoints]
+[entryPoints.web]
+address = ":80"
+
+[entryPoints.websecure]
+address = ":443"
+[entryPoints.websecure.http.tls]
+# certResolver = "letsencrypt"
+# [[entryPoints.websecure.http.tls.domains]]
+# main = "hostname.name"
+
+# [certificatesResolvers.letsencrypt.acme]
+# storage = "/vol/acme/acme.json"
+# [certificatesResolvers.letsencrypt.acme.httpChallenge]
+# entryPoint = "web"

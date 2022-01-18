@@ -1,0 +1,82 @@
+version: '3'
+
+vars:
+    CURDIR:
+        sh: pwd
+    NAME:
+        sh: pwd | grep -Po "[^/]+$"
+    LOCAL_IP:
+        sh: hostname -I | grep -Po "^[0-9\.]+"
+    SUDO:
+        sh: |
+            if [[ "root" == "root" ]]; then
+                echo sudo
+            fi
+    CONF_EXAMPLE: conf/conf.toml
+    CONF_LIVE: vol/conf/conf.toml
+    PROVIDERS_EXAMPLE: conf/providers.toml
+    PROVIDERS_LIVE: vol/conf/providers.toml
+
+tasks:
+    default:
+        desc: default action, build and run the container
+        cmds:
+            - task: build
+            - task: run
+
+    fetch_bin:
+        desc: fetch traefik binary and prepare copying it into the container
+        cmds:
+            - cmd: mkdir -p "{{.CURDIR}}/docker/bin"
+            - cmd: cp -f "$(which traefik)" "{{.CURDIR}}/docker/bin/"
+
+    build:
+        desc: build the docker container
+        dir: docker
+        cmds:
+            - task: fetch_bin
+            - cmd: docker build --tag {{.NAME}} .
+
+    run:
+        desc: run the container
+        dir: docker
+        cmds:
+            - cmd: mkdir -p "{{.CURDIR}}/vol/conf"
+            - cmd: |
+                if [[ ! -f "{{.CURDIR}}/{{.CONF_LIVE}}" ]]; then
+                    cp -f "{{.CURDIR}}/{{.CONF_EXAMPLE}}" "{{.CURDIR}}/{{.CONF_LIVE}}"
+                fi
+            - cmd: |
+                if [[ ! -f "{{.CURDIR}}/{{.PROVIDERS_LIVE}}" ]]; then
+                    cp -f "{{.CURDIR}}/{{.PROVIDERS_EXAMPLE}}" "{{.CURDIR}}/{{.PROVIDERS_LIVE}}"
+                fi
+            - cmd: >-
+                docker run -d --restart always
+                --name {{.NAME}}
+                --volume "/var/run/docker.sock:/var/run/docker.sock:ro"
+                --volume "{{.CURDIR}}/vol:/vol"
+                -p "80:80"
+                -p "443:443"
+                {{.NAME}}
+        vars:
+            EP:
+                sh: |
+                    if [[ "{{.CLI_ARGS}}" =~ ^[0-9]+$ ]]; then
+                        echo {{.CLI_ARGS}}
+                    else
+                        echo 53
+                    fi
+
+    rm:
+        desc: remove images and containers
+        dir: docker
+        cmds:
+            - cmd: docker rm -f {{.NAME}}
+            - cmd: docker rmi -f {{.NAME}}
+
+    rebuild:
+        desc: remove and rebuild images and container
+        cmds:
+            - task: rm
+            - task: build
+            - task: run
