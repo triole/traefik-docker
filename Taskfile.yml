@@ -16,6 +16,8 @@ vars:
     CONF_LIVE: vol/conf/conf.toml
     PROVIDERS_EXAMPLE: conf/providers.toml
     PROVIDERS_LIVE: vol/conf/providers.toml
+    TIMEZONE:
+        sh: cat /etc/timezone
 
 tasks:
     default:
@@ -35,7 +37,10 @@ tasks:
         dir: docker
         cmds:
             - task: fetch_bin
-            - cmd: docker build --tag {{.NAME}} .
+            - cmd: >-
+                docker build
+                --build-arg TIMEZONE={{.TIMEZONE}}
+                --tag {{.NAME}} .
 
     run:
         desc: run the container
