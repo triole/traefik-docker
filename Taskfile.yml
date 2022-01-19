@@ -17,7 +17,7 @@ vars:
     PROVIDERS_EXAMPLE: conf/providers.toml
     PROVIDERS_LIVE: vol/conf/providers.toml
     TIMEZONE:
-        sh: cat /etc/timezone
+        sh: timedatectl | grep -Po "(?<=Time\szone:\s)[A-Za-z0-9/]+"
 
 tasks:
     default:
