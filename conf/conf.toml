@@ -1,6 +1,3 @@
-[file]
-watch = true
-
 [docker]
 endpoint = "unix:///var/run/docker.sock"
 domain = "localhost"
@@ -23,7 +20,8 @@ debug = true
 [providers]
 docker = true
 [providers.file]
-filename = "/vol/conf/providers.toml"
+directory = "/vol/conf/providers"
+watch = true
 
 [entryPoints]
 [entryPoints.web]
