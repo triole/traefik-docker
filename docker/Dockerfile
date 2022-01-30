@@ -9,7 +9,7 @@ LABEL traefik.http.routers.tfk.tls=false
 LABEL traefik.http.routers.tfk.entrypoints=web
 LABEL traefik.http.routers.tfk.rule="Host(`tfk.localhost`) || Host(`tfk.alma002.lin.gw`)"
 LABEL traefik.http.routers.tfk.service=api@internal
-LABEL traefik.http.routers.tfk.middlewares=escience_ips_only@file
+# LABEL traefik.http.routers.tfk.middlewares=escience_ips_only@file
 
 RUN apk --update add tzdata \
  && cp "/usr/share/zoneinfo/${TIMEZONE}" "/etc/localtime" \
