@@ -14,8 +14,8 @@ vars:
             fi
     CONF_EXAMPLE: conf/conf.toml
     CONF_LIVE: vol/conf/conf.toml
-    PROVIDERS_EXAMPLE: conf/providers.toml
-    PROVIDERS_LIVE: vol/conf/providers.toml
+    PROVIDERS_EXAMPLE: conf/providers
+    PROVIDERS_LIVE: vol/conf/providers
     TIMEZONE:
         sh: timedatectl | grep -Po "(?<=Time\szone:\s)[A-Za-z0-9/]+"
 
@@ -52,8 +52,8 @@ tasks:
                     cp -f "{{.CURDIR}}/{{.CONF_EXAMPLE}}" "{{.CURDIR}}/{{.CONF_LIVE}}"
                 fi
             - cmd: |
-                if [[ ! -f "{{.CURDIR}}/{{.PROVIDERS_LIVE}}" ]]; then
-                    cp -f "{{.CURDIR}}/{{.PROVIDERS_EXAMPLE}}" "{{.CURDIR}}/{{.PROVIDERS_LIVE}}"
+                if [[ ! -d "{{.CURDIR}}/{{.PROVIDERS_LIVE}}" ]]; then
+                    cp -rpf "{{.CURDIR}}/{{.PROVIDERS_EXAMPLE}}" "{{.CURDIR}}/{{.PROVIDERS_LIVE}}"
                 fi
             - cmd: >-
                 docker run -d --restart always
